@@ -100,7 +100,6 @@ class Game
       end
       moves.push([x - 1, y + 1]) unless find(x - 1, y + 1).nil? || find(x - 1, y + 1).piece.nil?
       moves.push([x + 1, y + 1]) unless find(x + 1, y + 1).nil? || find(x + 1, y + 1).piece.nil?
-      # hello start here (en passant)
     end
     if color == 'black'
       if y == 6
@@ -114,13 +113,68 @@ class Game
     moves
   end
 
+  # need to check color for castling
+  def get_king_moves(x, y, color)
+    moves = [[-1, 0], [1, 0], [0, -1], [0, 1]]
+    moves.map! { |move| [x + move[0], y + move[1]] }
+    moves.keep_if { |a, b| a <= 7 && a >= 0 && b <= 7 && b >= 0 }
+    # castling
+    # case color
+    # when 'white' then
+    # when 'black' then
+    # end
+  end
+
+  def get_queen_moves(x, y)
+    moves = [[1, 1], [2, 2], [3, 3], [4, 4], [5, 5], [6, 6], [7, 7],
+             [-1, 1], [-2, 2], [-3, 3], [-4, 4], [-5, 5], [-6, 6], [-7, 7],
+             [1, -1], [2, -2], [3, -3], [4, -4], [5, -5], [6, -6], [7, -7],
+             [-1, -1], [-2, -2], [-3, -3], [-4, -4], [-5, -5], [-6, -6], [-7, -7],
+             [0, 1], [0, 2], [0, 3], [0, 4], [0, 5], [0, 6], [0, 7],
+             [1, 0], [2, 0], [3, 0], [4, 0], [5, 0], [6, 0], [7, 0],
+             [0, -1], [0, -2], [0, -3], [0, -4], [0, -5], [0, -6], [0, -7],
+             [-1, 0], [-2, 0], [-3, 0], [-4, 0], [-5, 0], [-6, 0], [-7, 0]]
+    moves.map! { |move| [x + move[0], y + move[1]] }
+    moves.keep_if { |a, b| a <= 7 && a >= 0 && b <= 7 && b >= 0 }
+  end
+
+  def get_knight_moves(x, y)
+    moves = [[-1, 2], [1, 2], [2, 1], [2, -1], [1, -2], [-1, -2], [-2, -1], [-2, 1]]
+    moves.map! { |move| [x + move[0], y + move[1]] }
+    moves.keep_if { |a, b| a <= 7 && a >= 0 && b <= 7 && b >= 0 }
+  end
+
+  def get_bishop_moves(x, y)
+    moves = [[1, 1], [2, 2], [3, 3], [4, 4], [5, 5], [6, 6], [7, 7],
+             [-1, 1], [-2, 2], [-3, 3], [-4, 4], [-5, 5], [-6, 6], [-7, 7],
+             [1, -1], [2, -2], [3, -3], [4, -4], [5, -5], [6, -6], [7, -7],
+             [-1, -1], [-2, -2], [-3, -3], [-4, -4], [-5, -5], [-6, -6], [-7, -7]]
+    moves.map! { |move| [x + move[0], y + move[1]] }
+    moves.keep_if { |a, b| a <= 7 && a >= 0 && b <= 7 && b >= 0 }
+  end
+
+  def get_rook_moves(x, y)
+    moves = []
+    directions = [
+      [[0, 1], [0, 2], [0, 3], [0, 4], [0, 5], [0, 6], [0, 7]],
+      [[1, 0], [2, 0], [3, 0], [4, 0], [5, 0], [6, 0], [7, 0]],
+      [[0, -1], [0, -2], [0, -3], [0, -4], [0, -5], [0, -6], [0, -7]],
+      [[-1, 0], [-2, 0], [-3, 0], [-4, 0], [-5, 0], [-6, 0], [-7, 0]]
+    ]
+
+    # start here! rewrite per direction to check for collision
+    moves.map! { |move| [x + move[0], y + move[1]] }
+    moves.keep_if { |a, b| a <= 7 && a >= 0 && b <= 7 && b >= 0 }
+  end
+
   private
 
   def get_valid_moves(current_piece, start_x, start_y)
     case current_piece
     when '♟︎' then get_pawn_moves(start_x, start_y, 'black')
     when '♙' then get_pawn_moves(start_x, start_y, 'white')
-    when '♚', '♔' then get_king_moves(start_x, start_y)
+    when '♚' then get_king_moves(start_x, start_y, 'black')
+    when '♔' then get_king_moves(start_x, start_y, 'white')
     when '♛', '♕' then get_queen_moves(start_x, start_y)
     when '♞', '♘' then get_knight_moves(start_x, start_y)
     when '♝', '♗' then get_bishop_moves(start_x, start_y)
