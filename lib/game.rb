@@ -149,36 +149,70 @@ class Game
              [-1, 1], [-2, 2], [-3, 3], [-4, 4], [-5, 5], [-6, 6], [-7, 7],
              [1, -1], [2, -2], [3, -3], [4, -4], [5, -5], [6, -6], [7, -7],
              [-1, -1], [-2, -2], [-3, -3], [-4, -4], [-5, -5], [-6, -6], [-7, -7]]
-    moves.map! { |move| [x + move[0], y + move[1]] }
-    moves.keep_if { |a, b| a <= 7 && a >= 0 && b <= 7 && b >= 0 }
+    # start here! rewrite
   end
 
-  def get_rook_moves(x, y)
-    moves = []
+  def get_rook_moves(x, y, color)
     directions = [
       [[0, 1], [0, 2], [0, 3], [0, 4], [0, 5], [0, 6], [0, 7]],
       [[1, 0], [2, 0], [3, 0], [4, 0], [5, 0], [6, 0], [7, 0]],
       [[0, -1], [0, -2], [0, -3], [0, -4], [0, -5], [0, -6], [0, -7]],
       [[-1, 0], [-2, 0], [-3, 0], [-4, 0], [-5, 0], [-6, 0], [-7, 0]]
     ]
-
-    # start here! rewrite per direction to check for collision
-    moves.map! { |move| [x + move[0], y + move[1]] }
-    moves.keep_if { |a, b| a <= 7 && a >= 0 && b <= 7 && b >= 0 }
+    set_moves(x, y, color, directions)
   end
 
   private
 
+  def set_moves(x, y, color, directions)
+    moves = []
+    directions.each do |direction|
+      direction.each do |move|
+        coordinates = [x + move[0], y + move[1]]
+        break unless inside_board?(coordinates)
+
+        piece = find(coordinates[0], coordinates[1]).piece  # rewrite this? or split to new method
+        if piece.nil?
+          moves.push(coordinates)
+        else
+          moves.push(coordinates) if enemy_piece?(color, piece)
+          break
+        end
+      end
+    end
+    moves
+  end
+
+  def enemy_piece?(color, test_piece)
+    test_piece_color = get_color(test_piece)
+    return true if test_piece_color != color
+
+    false
+  end
+
+  def inside_board?(coordinates)
+    a = coordinates[0]
+    b = coordinates[1]
+    return true if a <= 7 && a >= 0 && b <= 7 && b >= 0
+
+    false
+  end
+
   def get_valid_moves(current_piece, start_x, start_y)
     case current_piece
-    when '♟︎' then get_pawn_moves(start_x, start_y, 'black')
-    when '♙' then get_pawn_moves(start_x, start_y, 'white')
-    when '♚' then get_king_moves(start_x, start_y, 'black')
-    when '♔' then get_king_moves(start_x, start_y, 'white')
+    when '♟︎', '♙' then get_pawn_moves(start_x, start_y, get_color(current_piece))
+    when '♚', '♔' then get_king_moves(start_x, start_y, get_color(current_piece))
     when '♛', '♕' then get_queen_moves(start_x, start_y)
     when '♞', '♘' then get_knight_moves(start_x, start_y)
     when '♝', '♗' then get_bishop_moves(start_x, start_y)
     when '♜', '♖' then get_rook_moves(start_x, start_y)
+    end
+  end
+
+  def get_color(piece)
+    case piece
+    when '♟︎', '♚', '♛', '♞', '♝', '♜' then 'black'
+    when '♙', '♔', '♕', '♘', '♗', '♖' then 'white'
     end
   end
 
