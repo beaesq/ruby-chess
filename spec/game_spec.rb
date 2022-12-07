@@ -156,41 +156,126 @@ describe Game do
         # checks if rook is still in original square
       end
     end
+    context 'when there is an enemy piece to capture' do
+      
+    end
+    context 'when there is a friendly piece in the way' do
+      
+    end
   end
 
   describe '#get_queen_moves' do
-    context 'when queen is at a corner' do
+    context 'when there are no pieces in the way' do
       it 'returns the correct moves' do
         start_coordinates = [0, 7]
-        valid_moves = new_game.get_queen_moves(start_coordinates[0], start_coordinates[1])
+        color = 'white'
+        valid_moves = new_game.get_queen_moves(start_coordinates[0], start_coordinates[1], color)
         correct_moves = [[0, 0], [0, 1], [0, 2], [0, 3], [0, 4], [0, 5], [0, 6], [1, 6], [2, 5], [3, 4], [4, 3], [5, 2], [6, 1], [7, 0], [1, 7], [2, 7], [3, 7], [4, 7], [5, 7], [6, 7], [7, 7]]
+        expect(valid_moves).to match_array(correct_moves)
+      end
+    end
+    context 'when there is an enemy piece to capture' do
+      before do
+        board_array = new_game.instance_variable_get(:@board_array)
+        board_array[2][4].piece = '♚'
+        new_game.instance_variable_set(:@board_array, board_array)
+      end
+      it 'returns the correct moves' do
+        start_coordinates = [0, 7]
+        color = 'white'
+        valid_moves = new_game.get_queen_moves(start_coordinates[0], start_coordinates[1], color)
+        correct_moves = []
+        expect(valid_moves).to match_array(correct_moves)
+        # start here! finish converting the other pieces
+      end
+    end
+    context 'when there is a friendly piece in the way' do
+      
+    end
+  end
+
+  describe '#get_knight_moves' do
+    context 'when there are no pieces in the way' do
+      it 'returns the correct moves' do
+        start_coordinates = [1, 5]
+        color = 'black'
+        valid_moves = new_game.get_knight_moves(start_coordinates[0], start_coordinates[1], color)
+        correct_moves = [[0, 7], [2, 7], [3, 6], [3, 4], [2, 3], [0, 3]]
+        expect(valid_moves).to match_array(correct_moves)
+      end
+    end
+    context 'when there is an enemy piece to capture' do
+      before do
+        board_array = new_game.instance_variable_get(:@board_array)
+        board_array[2][4].piece = '♔'
+        new_game.instance_variable_set(:@board_array, board_array)
+      end
+      it 'returns the correct moves' do
+        start_coordinates = [4, 5]
+        color = 'black'
+        valid_moves = new_game.get_knight_moves(start_coordinates[0], start_coordinates[1], color)
+        correct_moves = [[3, 7], [5, 7], [6, 6], [6, 4], [5, 3], [3, 3], [2, 4], [2, 6]]
+        expect(valid_moves).to match_array(correct_moves)
+      end
+    end
+    context 'when there is a friendly piece in the way' do
+      before do
+        board_array = new_game.instance_variable_get(:@board_array)
+        board_array[2][4].piece = '♚'
+        new_game.instance_variable_set(:@board_array, board_array)
+      end
+      it 'returns the correct moves' do
+        start_coordinates = [4, 5]
+        color = 'black'
+        valid_moves = new_game.get_knight_moves(start_coordinates[0], start_coordinates[1], color)
+        correct_moves = [[3, 7], [5, 7], [6, 6], [6, 4], [5, 3], [3, 3], [2, 6]]
         expect(valid_moves).to match_array(correct_moves)
       end
     end
   end
 
-  describe '#get_knight_moves' do
-    it 'returns the correct moves' do
-      start_coordinates = [1, 5]
-      valid_moves = new_game.get_knight_moves(start_coordinates[0], start_coordinates[1])
-      correct_moves = [[0, 7], [2, 7], [3, 6], [3, 4], [2, 3], [0, 3]]
-      expect(valid_moves).to match_array(correct_moves)
-    end
-  end
-
   describe '#get_bishop_moves' do
-    #start here, rewrite for additional context
-    xit 'returns the correct moves' do
-      start_coordinates = [0, 7]
-      valid_moves = new_game.get_bishop_moves(start_coordinates[0], start_coordinates[1])
-      correct_moves = [[1, 6], [2, 5], [3, 4], [4, 3], [5, 2], [6, 1], [7, 0]]
-      expect(valid_moves).to match_array(correct_moves)
+    context 'when there are no pieces in the way' do
+      it 'returns the correct moves' do
+        start_coordinates = [0, 7]
+        color = 'black'
+        valid_moves = new_game.get_bishop_moves(start_coordinates[0], start_coordinates[1], color)
+        correct_moves = [[1, 6], [2, 5], [3, 4], [4, 3], [5, 2], [6, 1], [7, 0]]
+        expect(valid_moves).to match_array(correct_moves)
+      end
+    end
+    context 'when there is an enemy piece to capture' do
+      before do
+        board_array = new_game.instance_variable_get(:@board_array)
+        board_array[2][4].piece = '♔'
+        new_game.instance_variable_set(:@board_array, board_array)
+      end
+      it 'returns the correct moves' do
+        start_coordinates = [4, 6]
+        color = 'black'
+        valid_moves = new_game.get_bishop_moves(start_coordinates[0], start_coordinates[1], color)
+        correct_moves = [[2, 4], [3, 7], [5, 7], [3, 5], [5, 5], [6, 4], [7, 3]]
+        expect(valid_moves).to match_array(correct_moves)
+      end
+    end
+    context 'when there is a friendly piece in the way' do
+      before do
+        board_array = new_game.instance_variable_get(:@board_array)
+        board_array[2][4].piece = '♚'
+        new_game.instance_variable_set(:@board_array, board_array)
+      end
+      it 'returns the correct moves' do
+        start_coordinates = [4, 6]
+        color = 'black'
+        valid_moves = new_game.get_bishop_moves(start_coordinates[0], start_coordinates[1], color)
+        correct_moves = [[3, 7], [5, 7], [3, 5], [5, 5], [6, 4], [7, 3]]
+        expect(valid_moves).to match_array(correct_moves)
+      end
     end
   end
 
   describe '#get_rook_moves' do
-    # start! rewrite for context 'when there is a piece that can be captured'
-    context 'when there are no pieces to capture' do
+    context 'when there are no pieces in the way' do
       it 'returns the correct moves' do
         start_coordinates = [0, 7]
         color = 'white'
