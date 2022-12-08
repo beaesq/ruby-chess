@@ -91,33 +91,30 @@ class Game
   end
 
   def get_pawn_moves(x, y, color)
-    moves = []
-    if color == 'white'
-      if y == 1
-        moves.push([x, y + 1], [x, y + 2])
-      else
-        moves.push([x, y + 1])
-      end
-      moves.push([x - 1, y + 1]) unless find(x - 1, y + 1).nil? || find(x - 1, y + 1).piece.nil?
-      moves.push([x + 1, y + 1]) unless find(x + 1, y + 1).nil? || find(x + 1, y + 1).piece.nil?
-    end
-    if color == 'black'
-      if y == 6
-        moves.push([x, y - 1], [x, y - 2])
-      else
-        moves.push([x, y - 1])
-      end
-      moves.push([x - 1, y - 1]) unless find(x - 1, y - 1).nil? || find(x - 1, y - 1).piece.nil?
-      moves.push([x + 1, y - 1]) unless find(x + 1, y - 1).nil? || find(x + 1, y - 1).piece.nil?
-    end
+    directions = case color
+                 when 'black' then y == 6 ? [[[0, -1], [0, -2]]] : [[[0, -1]]]
+                 when 'white' then y == 1 ? [[[0, 1], [0, 2]]] : [[[0, 1]]]
+                 end
+    moves = set_moves(x, y, color, directions)
+    diagonals = get_pawn_diagonal_moves(x, y, color)
+    moves.push(diagonals) unless diagonals.nil?
     moves
+  end
+
+  def get_pawn_diagonal_moves(x, y, color)
+    directions = case color
+                 when 'black' then [[[-1, -1], [1, -1]]]
+                 when 'white' then [[[1, 1], [-1, 1]]]
+                 end
+    coordinates = set_moves(x, y, color, directions)
+    coordinates.delete_if { |coord| find(coord[0], coord[1]).piece.nil? }
+    nil if coordinates == [[]]
   end
 
   # need to check color for castling
   def get_king_moves(x, y, color)
-    moves = [[-1, 0], [1, 0], [0, -1], [0, 1]]
-    moves.map! { |move| [x + move[0], y + move[1]] }
-    moves.keep_if { |a, b| a <= 7 && a >= 0 && b <= 7 && b >= 0 }
+    directions = [[[-1, 0]], [[1, 0]], [[0, -1]], [[0, 1]], [[-1, -1]], [[-1, 1]], [[1, -1]], [[1, 1]]]
+    set_moves(x, y, color, directions)
     # castling
     # case color
     # when 'white' then
