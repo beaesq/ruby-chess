@@ -97,8 +97,7 @@ class Game
                  end
     moves = set_moves(x, y, color, directions)
     diagonals = get_pawn_diagonal_moves(x, y, color)
-    moves.push(diagonals) unless diagonals.nil?
-    moves
+    moves + diagonals
   end
 
   def get_pawn_diagonal_moves(x, y, color)
@@ -108,7 +107,6 @@ class Game
                  end
     coordinates = set_moves(x, y, color, directions)
     coordinates.delete_if { |coord| find(coord[0], coord[1]).piece.nil? }
-    nil if coordinates == [[]]
   end
 
   # need to check color for castling

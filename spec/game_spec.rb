@@ -104,7 +104,40 @@ describe Game do
   end
 
   describe '#get_pawn_diagonal_moves' do
-    # start here
+    context 'when there is an enemy piece diagonal to the pawn' do
+      before do
+        board_array = new_game.instance_variable_get(:@board_array)
+        board_array[4][3].piece = '♚'
+        new_game.instance_variable_set(:@board_array, board_array)
+      end
+      it 'returns the correct moves' do
+        start_coordinates = [3, 2]
+        color = 'white'
+        valid_moves = new_game.get_pawn_diagonal_moves(start_coordinates[0], start_coordinates[1], color)
+        expect(valid_moves).to match_array([[4, 3]])
+      end
+    end
+    context 'when there is a friendly piece diagonal to the pawn' do
+      before do
+        board_array = new_game.instance_variable_get(:@board_array)
+        board_array[3][5].piece = '♚'
+        new_game.instance_variable_set(:@board_array, board_array)
+      end
+      it 'returns the correct moves' do
+        start_coordinates = [4, 6]
+        color = 'black'
+        valid_moves = new_game.get_pawn_diagonal_moves(start_coordinates[0], start_coordinates[1], color)
+        expect(valid_moves).to match_array([])
+      end
+    end
+    context 'when there are no pieces diagonal to the pawn' do
+      it 'returns the correct moves' do
+        start_coordinates = [7, 7]
+        color = 'black'
+        valid_moves = new_game.get_pawn_diagonal_moves(start_coordinates[0], start_coordinates[1], color)
+        expect(valid_moves).to match_array([])
+      end
+    end
   end
 
   describe '#get_pawn_moves' do
@@ -125,7 +158,7 @@ describe Game do
     context 'when there is an enemy piece diagonal to the pawn' do
       it 'returns the correct moves from a starting square' do
         board_array = new_game.instance_variable_get(:@board_array)
-        board_array[1][2].piece = '♔'
+        board_array[1][2].piece = '♚'
         new_game.instance_variable_set(:@board_array, board_array)
         start_coordinates = [0, 1]
         color = 'white'
@@ -154,8 +187,14 @@ describe Game do
       end
     end
     context 'when there is a friendly piece in front' do
-      xit 'returns the correct moves' do
-        
+      it 'returns the correct moves' do
+        board_array = new_game.instance_variable_get(:@board_array)
+        board_array[4][2].piece = '♚'
+        new_game.instance_variable_set(:@board_array, board_array)
+        start_coordinates = [4, 3]
+        color = 'black'
+        valid_moves = new_game.get_pawn_moves(start_coordinates[0], start_coordinates[1], color)
+        expect(valid_moves).to match_array([])
       end
     end
     context 'when en passant is possible' do
