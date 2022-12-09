@@ -3,7 +3,7 @@
 require_relative '../lib/main'
 
 describe Game do
-  subject (:new_game) { described_class.new }
+  subject(:new_game) { described_class.new }
 
   describe '#set_board_start' do
     it 'places all pieces correctly' do
@@ -401,6 +401,26 @@ describe Game do
         valid_moves = new_game.get_rook_moves(start_coordinates[0], start_coordinates[1], color)
         correct_moves = [[0, 3], [1, 3], [3, 3], [4, 3], [5, 3], [6, 3], [7, 3], [2, 0], [2, 1], [2, 2]]
         expect(valid_moves).to match_array(correct_moves)
+      end
+    end
+  end
+
+  describe '#get_move_input' do
+    context 'when given three invalid moves and one valid move' do
+      before do
+        board_array = new_game.instance_variable_get(:@board_array)
+        board_array[2][4].piece = '♔'
+        new_game.instance_variable_set(:@board_array, board_array)
+        allow(new_game).to receive(:gets).and_return('8', '3', '3', '2', '4', '7', '7', '2', '4', '3', '4')
+        allow(new_game).to receive(:empty_square?).and_return(true, false)
+        allow(new_game).to receive(:valid_move?).and_return(false, true)
+      end
+      it 'asks to input a move four times' do
+        expect(new_game).to receive(:print).with('Please enter valid coordinates >:(').once
+        expect(new_game).to receive(:print).with("That square is empty! you can't move nothing").once
+        expect(new_game).to receive(:print).with('Please enter a valid move!').once
+        result = new_game.get_move_input
+        expect(result).to eq([[2, 4], [3, 4]])
       end
     end
   end

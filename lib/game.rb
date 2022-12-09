@@ -34,11 +34,22 @@ class Game
   end
 
   def get_move_input
-    #aks for input
-    input = gets.chomp
-    raise 'Please enter valid coordinates >:(' unless input.match?(/[0-7]/)
-    raise "That square is empty! you can't move nothing" if empty_square?(start_coordinates)
-    raise 'Please enter a valid move!' unless valid_move?(start_coordinates, end_coordinates)
+    move = []
+    2.times do |count|
+      coordinates = []
+      2.times do
+        input = gets.chomp
+        raise 'Please enter valid coordinates >:(' unless input.match?(/[0-7]/)
+
+        coordinates.push(input.to_i)
+      end
+      raise "That square is empty! you can't move nothing" if empty_square?(coordinates) && count.zero?
+
+      move.push(coordinates)
+    end
+    raise 'Please enter a valid move!' unless valid_move?(move[0], move[1])
+
+    move
   rescue StandardError => e
     print e.message
     retry
@@ -199,10 +210,10 @@ class Game
     case current_piece
     when '♟︎', '♙' then get_pawn_moves(start_x, start_y, get_color(current_piece))
     when '♚', '♔' then get_king_moves(start_x, start_y, get_color(current_piece))
-    when '♛', '♕' then get_queen_moves(start_x, start_y)
-    when '♞', '♘' then get_knight_moves(start_x, start_y)
-    when '♝', '♗' then get_bishop_moves(start_x, start_y)
-    when '♜', '♖' then get_rook_moves(start_x, start_y)
+    when '♛', '♕' then get_queen_moves(start_x, start_y, get_color(current_piece))
+    when '♞', '♘' then get_knight_moves(start_x, start_y, get_color(current_piece))
+    when '♝', '♗' then get_bishop_moves(start_x, start_y, get_color(current_piece))
+    when '♜', '♖' then get_rook_moves(start_x, start_y, get_color(current_piece))
     end
   end
 
