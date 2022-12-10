@@ -1,14 +1,40 @@
 # frozen_string_literal: true
 
-require_relative 'player'
-require_relative 'board'
-require_relative 'square'
-
 # chess chess chess
 class Game
+  require_relative 'player'
+  require_relative 'board'
+  require_relative 'square'
+  include Board
+
   def initialize
     @board_array = make_board_array
+    @player_a = nil
+    @player_b = nil
   end
+
+  def play_game
+    display_intro
+    set_players
+    @current_player = @player_a
+    game_loop
+    display_board
+    display_outro
+  end
+
+  def game_loop
+    until game_draw?
+      display_board
+      move_piece
+      break if checkmate?(@current_player)
+
+      @current_player = @current_player == @player_a ? @player_b : @player_a
+    end
+  end
+
+  def game_draw?; end
+
+  def checkmate?(current_player); end
 
   def make_board_array
     board_array = []
@@ -36,12 +62,14 @@ class Game
   def get_move_input
     move = []
     2.times do |count|
+      print_move_input(count)
       coordinates = []
-      2.times do
+      2.times do |coord_count|
+        print_coordinate_input(coord_count)
         input = gets.chomp
-        raise 'Please enter valid coordinates >:(' unless input.match?(/[0-7]/)
+        raise 'Please enter valid coordinates >:(' unless input.match?(/[1-8]/)
 
-        coordinates.push(input.to_i)
+        coordinates.push(input.to_i - 1)
       end
       raise "That square is empty! you can't move nothing" if empty_square?(coordinates) && count.zero?
 
@@ -248,5 +276,21 @@ class Game
       when 7 then '♜'
       end
     end
+  end
+
+  def print_move_input(move_num)
+    message = case move_num
+              when 0 then 'Enter which piece to move: '
+              when 1 then 'Enter which square to move to: '
+              end
+    puts message
+  end
+
+  def print_coordinate_input(coordinate_num)
+    message = case coordinate_num
+              when 0 then 'x value (1-8): '
+              when 1 then 'y value (1-8): '
+              end
+    print message
   end
 end

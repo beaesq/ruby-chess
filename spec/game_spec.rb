@@ -411,7 +411,7 @@ describe Game do
         board_array = new_game.instance_variable_get(:@board_array)
         board_array[2][4].piece = '♔'
         new_game.instance_variable_set(:@board_array, board_array)
-        allow(new_game).to receive(:gets).and_return('8', '3', '3', '2', '4', '7', '7', '2', '4', '3', '4')
+        allow(new_game).to receive(:gets).and_return('9', '4', '4', '3', '5', '8', '8', '3', '5', '4', '5')
         allow(new_game).to receive(:empty_square?).and_return(true, false)
         allow(new_game).to receive(:valid_move?).and_return(false, true)
       end
@@ -419,9 +419,77 @@ describe Game do
         expect(new_game).to receive(:print).with('Please enter valid coordinates >:(').once
         expect(new_game).to receive(:print).with("That square is empty! you can't move nothing").once
         expect(new_game).to receive(:print).with('Please enter a valid move!').once
+        expect(new_game).to receive(:print_move_input).exactly(6).times
+        expect(new_game).to receive(:print_coordinate_input).exactly(11).times
         result = new_game.get_move_input
         expect(result).to eq([[2, 4], [3, 4]])
       end
     end
+  end
+
+  describe '#game_loop' do
+    context 'when four turns are done then the game ends through checkmate' do
+      subject(:win_game) { described_class.new }
+      let(:player_a) { instance_double(Player, name: 'Yves', color: 'white') }
+      let(:player_b) { instance_double(Player, name: 'Chuu', color: 'black') }
+
+      before do
+        allow(win_game).to receive(:game_draw?).and_return(false)
+        allow(win_game).to receive(:checkmate?).and_return(false,false, false, true)
+        win_game.instance_variable_set(:@current_player, player_a)
+        win_game.instance_variable_set(:@player_a, player_a)
+        win_game.instance_variable_set(:@player_b, player_b)
+        allow(win_game).to receive(:display_board)
+        allow(win_game).to receive(:move_piece)
+      end
+      it 'loops four times only' do
+        expect(win_game).to receive(:display_board).exactly(4).times
+        expect(win_game).to receive(:move_piece).exactly(4).times
+        win_game.game_loop
+      end
+      it 'has Player B as the winner' do
+        win_game.game_loop
+        current_player = win_game.instance_variable_get(:@current_player)
+        expect(current_player.name).to eq('Chuu')
+      end
+    end
+    context 'when three turns are done then the game ends in a draw' do
+      subject(:win_game) { described_class.new }
+      let(:player_a) { instance_double(Player, name: 'Yves', color: 'white') }
+      let(:player_b) { instance_double(Player, name: 'Chuu', color: 'black') }
+
+      before do
+        allow(win_game).to receive(:game_draw?).and_return(false, false, false, true)
+        allow(win_game).to receive(:checkmate?).and_return(false)
+        win_game.instance_variable_set(:@current_player, player_a)
+        win_game.instance_variable_set(:@player_a, player_a)
+        win_game.instance_variable_set(:@player_b, player_b)
+        allow(win_game).to receive(:display_board)
+        allow(win_game).to receive(:move_piece)
+      end
+      it 'loops three times only' do
+        expect(win_game).to receive(:display_board).exactly(3).times
+        expect(win_game).to receive(:move_piece).exactly(3).times
+        win_game.game_loop
+      end
+    end
+  end
+
+  describe '#checkmate?' do
+    context 'when the white player has been checkmated' do
+      before do
+        board_array = new_game.instance_variable_get(:@board_array)
+        #start here: make a checkmated board
+        board_array[2][4].piece = '♔'
+        new_game.instance_variable_set(:@board_array, board_array)
+      end
+      xit 'returns true' do
+        
+      end
+    end
+  end
+
+  describe '#game_draw?' do
+    
   end
 end
