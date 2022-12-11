@@ -475,16 +475,51 @@ describe Game do
     end
   end
 
+  describe '#check?' do
+    subject(:check_game) { described_class.new }
+    let(:player_a) { instance_double(Player, name: 'Yves', color: 'white') }
+    let(:player_b) { instance_double(Player, name: 'Chuu', color: 'black') }
+
+    context 'when a player is in check' do
+      before do
+        board_array = check_game.instance_variable_get(:@board_array)
+        board_array[3][3].piece = '♙'
+        board_array[1][2].piece = '♔'
+        board_array[4][4].piece = '♚'
+        check_game.instance_variable_set(:@board_array, board_array)
+        check_game.instance_variable_set(:@current_player, player_b)
+        check_game.instance_variable_set(:@player_a, player_a)
+        check_game.instance_variable_set(:@player_b, player_b)
+        # allow(check_game).to receive(:find_king).and_return([4, 4])
+      end
+      it 'returns true' do
+        current_player = check_game.instance_variable_get(:@current_player)
+        expect(check_game.check?(current_player)).to be true
+      end
+    end
+
+    # start here: write a when not in check test just in case lol
+  end
+
   describe '#checkmate?' do
+    subject(:check_game) { described_class.new }
+    let(:player_a) { instance_double(Player, name: 'Yves', color: 'white') }
+    let(:player_b) { instance_double(Player, name: 'Chuu', color: 'black') }
+
     context 'when the white player has been checkmated' do
       before do
-        board_array = new_game.instance_variable_get(:@board_array)
-        #start here: make a checkmated board
-        board_array[2][4].piece = '♔'
-        new_game.instance_variable_set(:@board_array, board_array)
+        board_array = check_game.instance_variable_get(:@board_array)
+        board_array[5][0].piece = '♕'
+        board_array[6][2].piece = '♔'
+        board_array[7][0].piece = '♚'
+        check_game.instance_variable_set(:@board_array, board_array)
+        check_game.instance_variable_set(:@current_player, player_a)
+        check_game.instance_variable_set(:@player_a, player_a)
+        check_game.instance_variable_set(:@player_b, player_b)
       end
       xit 'returns true' do
-        
+        current_player = check_game.instance_variable_get(:@current_player)
+        expect(check_game.checkmate?(current_player)).to be_true
       end
     end
   end

@@ -34,7 +34,22 @@ class Game
 
   def game_draw?; end
 
-  def checkmate?(current_player); end
+  def checkmate?(current_player)
+    
+  end
+
+  def check?(current_player, current_player_king_coordinates = find_king(current_player))
+    8.times do |x|
+      8.times do |y|
+        current_piece = find(x, y).piece
+        if !current_piece.nil? && enemy_piece?(current_player.color, current_piece)
+          valid_moves = get_valid_moves(current_piece, x, y)
+          return true if valid_moves.include?(current_player_king_coordinates)
+        end
+      end
+    end
+    false
+  end
 
   def make_board_array
     board_array = []
@@ -199,6 +214,17 @@ class Game
   end
 
   private
+
+  def find_king(current_player)
+    king = current_player.color == 'white' ? '♔' : '♚'
+    8.times do |x|
+      8.times do |y|
+        current_piece = find(x, y).piece
+        return [x, y] if current_piece == king
+      end
+    end
+    nil
+  end
 
   def set_moves(x, y, color, directions)
     moves = []
