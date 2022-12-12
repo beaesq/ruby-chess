@@ -33,15 +33,34 @@ class Game
   end
 
   def game_draw?; end
+  #start here! 
 
   def checkmate?(current_player)
-    
-  end
-
-  def check?(current_player, current_player_king_coordinates = find_king(current_player))
     8.times do |x|
       8.times do |y|
         current_piece = find(x, y).piece
+        unless current_piece.nil? || enemy_piece?(current_player.color, current_piece)
+          valid_moves = get_valid_moves(current_piece, x, y)
+          return false unless all_moves_in_check?([x, y], valid_moves, current_player)
+        end
+      end
+    end
+    true
+  end
+
+  def all_moves_in_check?(start_coordinates, valid_moves, current_player)
+    valid_moves.each do |end_coordinates|
+      board_copy = @board_array
+      move_piece([start_coordinates, end_coordinates, board_copy])
+      return false unless check?(current_player, board_copy)
+    end
+    true
+  end
+
+  def check?(current_player, board_array = @board_array, current_player_king_coordinates = find_king(current_player))
+    8.times do |x|
+      8.times do |y|
+        current_piece = find(x, y, board_array).piece
         if !current_piece.nil? && enemy_piece?(current_player.color, current_piece)
           valid_moves = get_valid_moves(current_piece, x, y)
           return true if valid_moves.include?(current_player_king_coordinates)
@@ -64,12 +83,12 @@ class Game
     board_array
   end
 
-  def move_piece
-    move = get_move_input
+  def move_piece(move = get_move_input, board_array = @board_array)
+    move = get_move_input if move.nil? # in case u need to set a custom board_array only? idk
     start_coordinates = move[0]
     end_coordinates = move[1]
-    end_sq = find(end_coordinates[0], end_coordinates[1])
-    start_sq = find(start_coordinates[0], start_coordinates[1])
+    end_sq = find(end_coordinates[0], end_coordinates[1], board_array)
+    start_sq = find(start_coordinates[0], start_coordinates[1], board_array)
     end_sq.piece = start_sq.piece
     start_sq.piece = nil
   end
@@ -215,11 +234,11 @@ class Game
 
   private
 
-  def find_king(current_player)
+  def find_king(current_player, board_array = @board_array)
     king = current_player.color == 'white' ? '♔' : '♚'
     8.times do |x|
       8.times do |y|
-        current_piece = find(x, y).piece
+        current_piece = find(x, y, board_array).piece
         return [x, y] if current_piece == king
       end
     end

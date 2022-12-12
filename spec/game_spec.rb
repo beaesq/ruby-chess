@@ -480,7 +480,7 @@ describe Game do
     let(:player_a) { instance_double(Player, name: 'Yves', color: 'white') }
     let(:player_b) { instance_double(Player, name: 'Chuu', color: 'black') }
 
-    context 'when a player is in check' do
+    context 'when the player is in check' do
       before do
         board_array = check_game.instance_variable_get(:@board_array)
         board_array[3][3].piece = '♙'
@@ -498,7 +498,26 @@ describe Game do
       end
     end
 
-    # start here: write a when not in check test just in case lol
+    context 'when the player is not in check' do
+      before do
+        board_array = check_game.instance_variable_get(:@board_array)
+        board_array[3][2].piece = '♙'
+        board_array[6][1].piece = '♙'
+        board_array[1][2].piece = '♔'
+        board_array[1][3].piece = '♖'
+        board_array[3][7].piece = '♗'
+        board_array[7][1].piece = '♘'
+        board_array[4][4].piece = '♚'
+        check_game.instance_variable_set(:@board_array, board_array)
+        check_game.instance_variable_set(:@current_player, player_b)
+        check_game.instance_variable_set(:@player_a, player_a)
+        check_game.instance_variable_set(:@player_b, player_b)
+      end
+      it 'returns false' do
+        current_player = check_game.instance_variable_get(:@current_player)
+        expect(check_game.check?(current_player)).to be false
+      end
+    end
   end
 
   describe '#checkmate?' do
@@ -506,25 +525,101 @@ describe Game do
     let(:player_a) { instance_double(Player, name: 'Yves', color: 'white') }
     let(:player_b) { instance_double(Player, name: 'Chuu', color: 'black') }
 
-    context 'when the white player has been checkmated' do
+    context 'when the current player has been checkmated' do
       before do
         board_array = check_game.instance_variable_get(:@board_array)
         board_array[5][0].piece = '♕'
         board_array[6][2].piece = '♔'
         board_array[7][0].piece = '♚'
         check_game.instance_variable_set(:@board_array, board_array)
-        check_game.instance_variable_set(:@current_player, player_a)
+        check_game.instance_variable_set(:@current_player, player_b)
+        check_game.instance_variable_set(:@player_a, player_a)
+        check_game.instance_variable_set(:@player_b, player_b)
+        # allow(check_game).to receive(:all_moves_in_check?).and_return(true)
+      end
+      it 'returns true' do
+        current_player = check_game.instance_variable_get(:@current_player)
+        expect(check_game.checkmate?(current_player)).to be true
+      end
+    end
+    context 'when the current player is only in check but not checkmated' do
+      before do
+        board_array = check_game.instance_variable_get(:@board_array)
+        board_array[3][3].piece = '♙'
+        board_array[1][2].piece = '♔'
+        board_array[4][4].piece = '♚'
+        check_game.instance_variable_set(:@board_array, board_array)
+        check_game.instance_variable_set(:@current_player, player_b)
         check_game.instance_variable_set(:@player_a, player_a)
         check_game.instance_variable_set(:@player_b, player_b)
       end
-      xit 'returns true' do
+      it 'returns false' do
         current_player = check_game.instance_variable_get(:@current_player)
-        expect(check_game.checkmate?(current_player)).to be_true
+        expect(check_game.checkmate?(current_player)).to be false
+      end
+    end
+  end
+
+  describe '#all_moves_in_check?' do
+    subject(:check_game) { described_class.new }
+    let(:player_a) { instance_double(Player, name: 'Yves', color: 'white') }
+    let(:player_b) { instance_double(Player, name: 'Chuu', color: 'black') }
+
+    context 'when all moves are in check' do
+      before do
+        board_array = check_game.instance_variable_get(:@board_array)
+        board_array[5][0].piece = '♕'
+        board_array[6][2].piece = '♔'
+        board_array[7][0].piece = '♚'
+        check_game.instance_variable_set(:@board_array, board_array)
+        check_game.instance_variable_set(:@current_player, player_b)
+        check_game.instance_variable_set(:@player_a, player_a)
+        check_game.instance_variable_set(:@player_b, player_b)
+      end
+      it 'returns true' do
+        current_player = check_game.instance_variable_get(:@current_player)
+        start_coordinates = [7, 0]
+        valid_moves = [[6, 0], [6, 1], [7, 1]]
+        expect(check_game.all_moves_in_check?(start_coordinates, valid_moves, current_player)).to be true
+      end
+      it 'does not affect the actual board array' do
+        board_array_copy = check_game.instance_variable_get(:@board_array)
+        current_player = check_game.instance_variable_get(:@current_player)
+        start_coordinates = [7, 0]
+        valid_moves = [[6, 0], [6, 1], [7, 1]]
+        check_game.all_moves_in_check?(start_coordinates, valid_moves, current_player)
+        expect(check_game.instance_variable_get(:@board_array)).to eq(board_array_copy)
+      end
+    end
+    context 'when not all moves are in check' do
+      before do
+        board_array = check_game.instance_variable_get(:@board_array)
+        board_array[3][3].piece = '♙'
+        board_array[1][2].piece = '♔'
+        board_array[4][4].piece = '♚'
+        check_game.instance_variable_set(:@board_array, board_array)
+        check_game.instance_variable_set(:@current_player, player_b)
+        check_game.instance_variable_set(:@player_a, player_a)
+        check_game.instance_variable_set(:@player_b, player_b)
+      end
+      it 'returns false' do
+        current_player = check_game.instance_variable_get(:@current_player)
+        start_coordinates = [4, 4]
+        valid_moves = [[3, 4], [3, 3], [4, 3], [5, 3], [5, 4], [5, 5], [4, 5], [3, 5]]
+        expect(check_game.all_moves_in_check?(start_coordinates, valid_moves, current_player)).to be false
+      end
+      it 'does not affect the actual board array' do
+        board_array_copy = check_game.instance_variable_get(:@board_array)
+        current_player = check_game.instance_variable_get(:@current_player)
+        start_coordinates = [4, 4]
+        valid_moves = [[3, 4], [3, 3], [4, 3], [5, 3], [5, 4], [5, 5], [4, 5], [3, 5]]
+        check_game.all_moves_in_check?(start_coordinates, valid_moves, current_player)
+        expect(check_game.instance_variable_get(:@board_array)).to eq(board_array_copy)
       end
     end
   end
 
   describe '#game_draw?' do
-    
+    #start here! write the tests first
   end
 end
