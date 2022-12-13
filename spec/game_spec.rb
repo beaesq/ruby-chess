@@ -538,16 +538,51 @@ describe Game do
         # allow(check_game).to receive(:all_moves_in_check?).and_return(true)
       end
       it 'returns true' do
+        board_copy = check_game.instance_variable_get(:@board_array)
         current_player = check_game.instance_variable_get(:@current_player)
         expect(check_game.checkmate?(current_player)).to be true
+        expect(check_game.instance_variable_get(:@board_array)).to eq(board_copy)
       end
     end
     context 'when the current player is only in check but not checkmated' do
       before do
         board_array = check_game.instance_variable_get(:@board_array)
         board_array[3][3].piece = '♙'
+        board_array[2][3].piece = '♖'
         board_array[1][2].piece = '♔'
         board_array[4][4].piece = '♚'
+        check_game.instance_variable_set(:@board_array, board_array)
+        check_game.instance_variable_set(:@current_player, player_b)
+        check_game.instance_variable_set(:@player_a, player_a)
+        check_game.instance_variable_set(:@player_b, player_b)
+      end
+      it 'returns false' do
+        current_player = check_game.instance_variable_get(:@current_player)
+        expect(check_game.checkmate?(current_player)).to be false
+      end
+    end
+    context 'when the current player is neither in check nor checkmated' do
+      before do
+        board_array = check_game.instance_variable_get(:@board_array)
+        board_array[3][2].piece = '♙'
+        board_array[1][2].piece = '♔'
+        board_array[4][4].piece = '♚'
+        check_game.instance_variable_set(:@board_array, board_array)
+        check_game.instance_variable_set(:@current_player, player_b)
+        check_game.instance_variable_set(:@player_a, player_a)
+        check_game.instance_variable_set(:@player_b, player_b)
+      end
+      it 'returns false' do
+        current_player = check_game.instance_variable_get(:@current_player)
+        expect(check_game.checkmate?(current_player)).to be false
+      end
+    end
+    context 'when the player is stalemated' do
+      before do
+        board_array = check_game.instance_variable_get(:@board_array)
+        board_array[6][5].piece = '♕'
+        board_array[0][0].piece = '♔'
+        board_array[7][7].piece = '♚'
         check_game.instance_variable_set(:@board_array, board_array)
         check_game.instance_variable_set(:@current_player, player_b)
         check_game.instance_variable_set(:@player_a, player_a)
@@ -620,6 +655,28 @@ describe Game do
   end
 
   describe '#game_draw?' do
-    #start here! write the tests first
+    # write a stalemate checker at the very least
+  end
+
+  describe '#find_king' do
+    subject(:king_game) { described_class.new }
+    let(:player_a) { instance_double(Player, name: 'Yves', color: 'white') }
+    let(:player_b) { instance_double(Player, name: 'Chuu', color: 'black') }
+
+    before do
+      board_array = king_game.instance_variable_get(:@board_array)
+      board_array[6][5].piece = '♕'
+      board_array[0][0].piece = '♔'
+      board_array[7][7].piece = '♚'
+      king_game.instance_variable_set(:@board_array, board_array)
+      king_game.instance_variable_set(:@current_player, player_b)
+      king_game.instance_variable_set(:@player_a, player_a)
+      king_game.instance_variable_set(:@player_b, player_b)
+    end
+    it 'returns the correct coordinates' do
+      current_player = king_game.instance_variable_get(:@current_player)
+      coordinates = [7, 7]
+      expect(king_game.find_king(current_player)).to eq(coordinates)
+    end
   end
 end

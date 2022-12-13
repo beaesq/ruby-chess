@@ -45,13 +45,15 @@ class Game
         end
       end
     end
+    return false unless check?(current_player)
+
     true
   end
 
   def all_moves_in_check?(start_coordinates, valid_moves, current_player)
     valid_moves.each do |end_coordinates|
-      board_copy = @board_array
-      move_piece([start_coordinates, end_coordinates, board_copy])
+      board_copy = copy_board_array
+      move_piece([start_coordinates, end_coordinates], board_copy)
       return false unless check?(current_player, board_copy)
     end
     true
@@ -232,8 +234,6 @@ class Game
     set_moves(x, y, color, directions)
   end
 
-  private
-
   def find_king(current_player, board_array = @board_array)
     king = current_player.color == 'white' ? '♔' : '♚'
     8.times do |x|
@@ -243,6 +243,18 @@ class Game
       end
     end
     nil
+  end
+
+  private
+
+  def copy_board_array
+    board_copy = make_board_array
+    board_copy.each do |line_copy|
+      line_copy.each do |square_copy|
+        square_copy.piece = find(square_copy.x, square_copy.y).piece
+      end
+    end
+    board_copy
   end
 
   def set_moves(x, y, color, directions)
