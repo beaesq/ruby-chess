@@ -372,7 +372,6 @@ class Game
     print message
   end
 
-  public
   def display_board(board_array = @board_array)
     clear
     8.times do |line_num|
