@@ -32,8 +32,28 @@ class Game
     end
   end
 
-  def game_draw?; end
-  #start here! 
+  def game_draw?
+    return true if stalemate?
+
+    # add other draw conditions here if u have the energy to
+    false
+  end
+
+  def stalemate?(current_player = @current_player)
+    return false if check?(current_player)
+
+    8.times do |x|
+      8.times do |y|
+        current_piece = find(x, y).piece
+        unless current_piece.nil? || enemy_piece?(current_player.color, current_piece)
+          valid_moves = get_valid_moves(current_piece, x, y)
+          next if all_moves_in_check?([x, y], valid_moves, current_player)
+          return false
+        end
+      end
+    end
+    true
+  end
 
   def checkmate?(current_player)
     8.times do |x|
@@ -171,6 +191,7 @@ class Game
                  when 'white' then y == 1 ? [[[0, 1], [0, 2]]] : [[[0, 1]]]
                  end
     moves = set_moves(x, y, color, directions)
+    moves.keep_if { |move| find(move[0], move[1]).piece.nil? }
     diagonals = get_pawn_diagonal_moves(x, y, color)
     moves + diagonals
   end
@@ -349,5 +370,27 @@ class Game
               when 1 then 'y value (1-8): '
               end
     print message
+  end
+
+  public
+  def display_board(board_array = @board_array)
+    clear
+    8.times do |line_num|
+      print_border(line_num)
+      print_squares(line_num, board_array)
+    end
+    print_border(8)
+    print_border(9)
+  end
+
+  def print_squares(y, board_array = @board_array)
+    print "#{8 - y} "
+    8.times do |x|
+      print '┃ '
+      square = find(x, y, board_array).piece.nil? ? ' ' : find(x, y, board_array).piece
+      print square
+      print ' '
+    end
+    puts '┃'
   end
 end

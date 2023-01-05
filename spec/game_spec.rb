@@ -183,7 +183,7 @@ describe Game do
         start_coordinates = [1, 1]
         color = 'white'
         valid_moves = new_game.get_pawn_moves(start_coordinates[0], start_coordinates[1], color)
-        expect(valid_moves).to match_array([[1, 2]])
+        expect(valid_moves).to match_array([])
       end
     end
     context 'when there is a friendly piece in front' do
@@ -655,7 +655,25 @@ describe Game do
   end
 
   describe '#game_draw?' do
-    # write a stalemate checker at the very least
+    subject(:draw_game) { described_class.new }
+    let(:player_a) { instance_double(Player, name: 'Yves', color: 'white') }
+    let(:player_b) { instance_double(Player, name: 'Chuu', color: 'black') }
+
+    context 'when player is stalemated' do
+      before do
+        board_array = draw_game.instance_variable_get(:@board_array)
+        board_array[5][6].piece = '♕'
+        board_array[0][0].piece = '♔'
+        board_array[7][7].piece = '♚'
+        draw_game.instance_variable_set(:@board_array, board_array)
+        draw_game.instance_variable_set(:@current_player, player_b)
+        draw_game.instance_variable_set(:@player_a, player_a)
+        draw_game.instance_variable_set(:@player_b, player_b)
+      end
+      xit 'returns true' do
+        expect(draw_game.game_draw?).to be true
+      end
+    end
   end
 
   describe '#find_king' do
