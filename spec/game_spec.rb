@@ -725,4 +725,17 @@ describe Game do
       end
     end
   end
+
+  describe '#set_players' do
+    subject(:play_game) { described_class.new }
+    before do
+      allow(play_game).to receive(:gets).and_return('Yves', 'Chuu')
+      allow(play_game).to receive(:print)
+    end
+    it 'creates two players' do
+      expect(Player).to receive(:new).with('white', 'Yves').exactly(:once)
+      expect(Player).to receive(:new).with('black', 'Chuu').exactly(:once)
+      play_game.set_players
+    end
+  end
 end

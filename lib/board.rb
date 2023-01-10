@@ -7,11 +7,11 @@ module Board
     puts "Let's play some chess!"
   end
 
-  def display_outro(winning_player, is_game_draw)
+  def display_outro(winning_player_name, is_game_draw)
     if is_game_draw
       puts "Game over! It's a draw!"
     else
-      puts "Congratulations! #{winning_player.name} won!"
+      puts "Congratulations! #{winning_player_name} won!"
     end
   end
 

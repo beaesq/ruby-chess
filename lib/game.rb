@@ -19,7 +19,12 @@ class Game
     @current_player = @player_a
     game_loop
     display_board
-    display_outro(winning_player, game_draw?)
+    display_outro(winning_player.name, game_draw?)
+  end
+
+  def set_players
+    @player_a = Player.new('white', get_player_name(1))
+    @player_b = Player.new('black', get_player_name(2))
   end
 
   def winning_player
@@ -397,5 +402,13 @@ class Game
       print ' '
     end
     puts '┃'
+  end
+
+  def get_player_name(player_num)
+    case player_num
+    when 1 then print 'Enter the name of the first player (white): '
+    when 2 then print 'Enter the name of the second player (black): '
+    end
+    gets.chomp
   end
 end
