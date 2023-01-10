@@ -19,7 +19,12 @@ class Game
     @current_player = @player_a
     game_loop
     display_board
-    display_outro
+    winning_player = get_winner
+    display_outro(winning_player, game_draw?)
+  end
+
+  def get_winner
+    @current_player == @player_a ? @player_b : @player_a
   end
 
   def game_loop

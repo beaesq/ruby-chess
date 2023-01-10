@@ -2,6 +2,19 @@
 
 # display methods
 module Board
+  def display_intro
+    puts 'Welcome!'
+    puts "Let's play some chess!"
+  end
+
+  def display_outro(winning_player, is_game_draw)
+    if is_game_draw
+      puts "Game over! It's a draw!"
+    else
+      puts "Congratulations! #{winning_player.name} won!"
+    end
+  end
+
   def print_border(line_num)
     line = case line_num
            when 0 then '┏━━━┳━━━┳━━━┳━━━┳━━━┳━━━┳━━━┳━━━┓'
