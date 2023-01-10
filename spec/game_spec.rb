@@ -707,9 +707,10 @@ describe Game do
         win_game.instance_variable_set(:@current_player, player_b)
         win_game.instance_variable_set(:@player_a, player_a)
         win_game.instance_variable_set(:@player_b, player_b)
+        allow(win_game).to receive(:checkmate?).and_return(true)
       end
       it 'returns Player A' do
-        expect(win_game.get_winner).to eq(player_a)
+        expect(win_game.winning_player).to eq(player_a)
       end
     end
     context 'when Player A has been checkmated' do
@@ -717,9 +718,10 @@ describe Game do
         win_game.instance_variable_set(:@current_player, player_a)
         win_game.instance_variable_set(:@player_a, player_a)
         win_game.instance_variable_set(:@player_b, player_b)
+        allow(win_game).to receive(:checkmate?).and_return(true)
       end
       it 'returns Player B' do
-        expect(win_game.get_winner).to eq(player_b)
+        expect(win_game.winning_player).to eq(player_b)
       end
     end
   end

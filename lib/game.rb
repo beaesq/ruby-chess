@@ -19,11 +19,12 @@ class Game
     @current_player = @player_a
     game_loop
     display_board
-    winning_player = get_winner
     display_outro(winning_player, game_draw?)
   end
 
-  def get_winner
+  def winning_player
+    return nil unless checkmate?(@current_player)
+
     @current_player == @player_a ? @player_b : @player_a
   end
 
