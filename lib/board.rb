@@ -3,8 +3,7 @@
 # display methods
 module Board
   def display_intro
-    puts 'Welcome!'
-    puts "Let's play some chess!"
+    puts " ♔ Let's play some chess! ♚ "
   end
 
   def display_outro(winning_player_name, is_game_draw)
@@ -17,8 +16,8 @@ module Board
 
   def print_border(line_num)
     line = case line_num
-           when 0 then '┏━━━┳━━━┳━━━┳━━━┳━━━┳━━━┳━━━┳━━━┓'
-           when 1..7 then '┣━━━╋━━━╋━━━╋━━━╋━━━╋━━━╋━━━╋━━━┫'
+           when 7 then '┏━━━┳━━━┳━━━┳━━━┳━━━┳━━━┳━━━┳━━━┓'
+           when 0..6 then '┣━━━╋━━━╋━━━╋━━━╋━━━╋━━━╋━━━╋━━━┫'
            when 8 then '┗━━━┻━━━┻━━━┻━━━┻━━━┻━━━┻━━━┻━━━┛'
            when 9 then '  1   2   3   4   5   6   7   8'
            end

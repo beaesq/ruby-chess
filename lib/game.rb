@@ -5,6 +5,7 @@ class Game
   require_relative 'player'
   require_relative 'board'
   require_relative 'square'
+  require_relative 'saveload'
   include Board
 
   def initialize
@@ -15,11 +16,63 @@ class Game
 
   def play_game
     display_intro
-    set_players
-    @current_player = @player_a
+    if input_start_game == 1 # new game
+      set_players
+      @current_player = @player_a
+    else # load game
+      load_game
+    end
     game_loop
     display_board
     display_outro(winning_player.name, game_draw?)
+  end
+
+  def load_game
+    data = load_data
+    @player_a = load_player_data(data['player_a'])
+    @player_b = load_player_data(data['player_b'])
+    @board_array = load_board_array_data(data['board_array'])
+  end
+
+  def load_board_array_data(board_array_data)
+    new_board = make_board_array
+    new_board.each_with_index do |new_line, y_num|
+      new_line.each_with_index do |new_square, x_num|
+        new_square.piece = board_array_data[y_num][x_num]
+      end
+    end
+    new_board
+  end
+
+  def make_board_array_data(board_array = @board_array)
+    array_data = []
+    board_array.each do |line|
+      line_data = []
+      line.each do |square|
+        line_data << square.piece
+      end
+      array_data << line_data
+    end
+    array_data
+  end
+
+  def load_player_data(player_data)
+    Player.new(player_data['color'], player_data['name'])
+  end
+
+  def make_player_data(player)
+    {
+      name: player.name,
+      color: player.color
+    }
+  end
+
+  def make_data_hash
+    {
+      player_a: make_player_data(@player_a),
+      player_b: make_player_data(@player_b),
+      board_array: make_board_array_data(@board_array)
+    }
   end
 
   def set_players
@@ -384,8 +437,8 @@ class Game
   end
 
   def display_board(board_array = @board_array)
-    clear
-    8.times do |line_num|
+    #clear UNCOMMENT THIS
+    7.downto(0) do |line_num|
       print_border(line_num)
       print_squares(line_num, board_array)
     end
@@ -394,7 +447,7 @@ class Game
   end
 
   def print_squares(y, board_array = @board_array)
-    print "#{8 - y} "
+    print "#{y + 1} "
     8.times do |x|
       print '┃ '
       square = find(x, y, board_array).piece.nil? ? ' ' : find(x, y, board_array).piece
@@ -410,5 +463,18 @@ class Game
     when 2 then print 'Enter the name of the second player (black): '
     end
     gets.chomp
+  end
+
+  # looks for json files
+  def input_start_game
+    print 'Enter 1 to start a new game, 2 to load a previous game: '
+    input = gets.chomp
+    raise 'Please enter 1 or 2.' unless %w[1 2].include?(input)
+    raise 'No save games to load.' if input == '2' && Dir.glob('*.json').length.zero?
+
+    input.to_i
+  rescue StandardError => e
+    puts e.message
+    retry
   end
 end

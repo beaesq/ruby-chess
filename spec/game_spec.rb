@@ -738,4 +738,62 @@ describe Game do
       play_game.set_players
     end
   end
+
+  describe '#make_board_array_data' do
+    subject(:play_game) { described_class.new }
+    before do
+      board_array = play_game.instance_variable_get(:@board_array)
+      board_array[6][5].piece = '♕'
+      board_array[0][0].piece = '♔'
+      board_array[7][7].piece = '♚'
+      play_game.instance_variable_set(:@board_array, board_array)
+    end
+    it 'creates an array of the pieces' do
+      correct_array = [
+        ['♔', nil, nil, nil, nil, nil, nil, nil],
+        [nil, nil, nil, nil, nil, nil, nil, nil],
+        [nil, nil, nil, nil, nil, nil, nil, nil],
+        [nil, nil, nil, nil, nil, nil, nil, nil],
+        [nil, nil, nil, nil, nil, nil, nil, nil],
+        [nil, nil, nil, nil, nil, nil, nil, nil],
+        [nil, nil, nil, nil, nil, '♕', nil, nil],
+        [nil, nil, nil, nil, nil, nil, nil, '♚']
+      ]
+      expect(play_game.make_board_array_data).to eq(correct_array)
+    end
+  end
+
+  describe '#load_board_array_data' do
+    subject(:play_game) { described_class.new }
+    it 'creates new board array made of Squares with the correct pieces' do
+      board_array_data = [
+        ['♔', '♖', nil, nil, nil, nil, nil, nil],
+        [nil, nil, nil, nil, nil, nil, nil, nil],
+        [nil, nil, nil, nil, nil, nil, nil, nil],
+        [nil, nil, nil, nil, nil, nil, nil, nil],
+        [nil, nil, nil, nil, nil, nil, nil, nil],
+        [nil, nil, nil, nil, nil, nil, nil, nil],
+        [nil, nil, nil, nil, nil, '♕', nil, nil],
+        [nil, nil, nil, nil, nil, nil, nil, '♚']
+      ]
+      new_board_array = play_game.load_board_array_data(board_array_data)
+      8.times do |x|
+        8.times do |y|
+          expect(play_game.find(x, y, new_board_array)).to be_a(Square)
+          if x == 0 && y == 0
+            correct_piece = '♔'
+          elsif x == 0 && y == 1
+            correct_piece = '♖'
+          elsif x == 6 && y == 5
+            correct_piece = '♕'
+          elsif x == 7 && y == 7
+            correct_piece = '♚'
+          else
+            correct_piece = nil
+          end
+          expect(play_game.find(x, y, new_board_array).piece).to eq(correct_piece)
+        end
+      end
+    end
+  end
 end
