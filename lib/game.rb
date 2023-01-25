@@ -19,6 +19,7 @@ class Game
     if input_start_game == 1 # new game
       set_players
       @current_player = @player_a
+      set_board_start
     else # load game
       load_game
     end
@@ -97,7 +98,7 @@ class Game
   end
 
   def game_draw?
-    return true if stalemate?
+    #return true if stalemate?
 
     # add other draw conditions here if u have the energy to
     false
@@ -437,7 +438,8 @@ class Game
   end
 
   def display_board(board_array = @board_array)
-    #clear UNCOMMENT THIS
+    clear
+    puts "#{@current_player.name}'s turn"
     7.downto(0) do |line_num|
       print_border(line_num)
       print_squares(line_num, board_array)
